@@ -3,62 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Price Calculator</title>
+    <title>Date Difference Calculator</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            max-width: 600px;
-            margin: auto;
-            padding: 20px;
+            margin: 20px;
         }
-        input {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            box-sizing: border-box;
+        input, button, select {
+            margin: 5px 0;
+            padding: 5px;
         }
-        button {
-            padding: 10px;
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        .output {
+        .result {
             margin-top: 20px;
         }
-        .output p {
-            background: #f9f9f9;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+        .dark-mode {
+            background-color: #121212;
+            color: #ffffff;
         }
-        .cost-price {
-            color: red;
-        }
-        .final-panel-discount {
-            color: green;
+        .toggle-btn {
+            margin: 20px 0;
         }
     </style>
 </head>
-<body>
-    <h1>Price Calculator</h1>
-    <label for="dropshipPrice">Dropship Price:</label>
-    <input type="number" id="dropshipPrice" placeholder="Enter Dropship Price" step="0.01">
-    <label for="dropshipDiscount">Dropship Discount:</label>
-    <input type="number" id="dropshipDiscount" placeholder="Enter Dropship Discount %" step="0.01">
-    <button onclick="calculate()">Calculate</button>
-    <div class="output">
-        <p id="costPrice" class="cost-price"></p>
-        <p id="finalPanelDiscount" class="final-panel-discount"></p>
-        <p id="panelPrice"></p>
-        <p id="panelDiscountNo"></p>
-        <p id="estimatedNumber"></p>
-        <p id="finalWebsitePrice"></p>
-    </div>
-    <script src="script.js"></script>
+<body id="main-body">
+    <h2>Date Difference Calculator</h2>
+
+    <label for="date1">Enter First Date:</label>
+    <input type="date" id="date1"><br>
+
+    <label for="date2">Enter Second Date:</label>
+    <input type="date" id="date2"><br>
+
+    <label for="outputFormat">Select Output Format:</label>
+    <select id="outputFormat">
+        <option value="detailed">Years, Months, Days</option>
+        <option value="days">Total Days</option>
+        <option value="weeks">Total Weeks</option>
+    </select><br>
+
+    <button onclick="calculateDifference()">Calculate</button>
+
+    <div class="result" id="result"></div>
+
+    <button class="toggle-btn" onclick="toggleDarkMode()">Toggle Dark Mode</button>
+
+    <script>
+        function calculateDifference() {
+            const date1 = document.getElementById("date1").value;
+            const date2 = document.getElementById("date2").value;
+            const format = document.getElementById("outputFormat").value;
+            const resultDiv = document.getElementById("result");
+
+            if (!date1 || !date2) {
+                resultDiv.innerHTML = "Please enter both dates.";
+                return;
+            }
+
+            const d1 = new Date(date1);
+            const d2 = new Date(date2);
+
+            let yearDiff = d1.getFullYear() - d2.getFullYear();
+            let monthDiff = d1.getMonth() - d2.getMonth();
+            let dayDiff = d1.getDate() - d2.getDate();
+
+            if (dayDiff < 0) {
+                monthDiff--;
+                dayDiff += new Date(d1.getFullYear(), d1.getMonth(), 0).getDate();
+            }
+            if (monthDiff < 0) {
+                yearDiff--;
+                monthDiff += 12;
+            }
+
+            const totalDays = Math.abs(Math.floor((d1 - d2) / (1000 * 60 * 60 * 24)));
+            const weeks = Math.floor(totalDays / 7);
+            const remainingDays = totalDays % 7;
+
+            if (format === "detailed") {
+                resultDiv.innerHTML = `
+                    <p><strong>Total Difference:</strong> ${yearDiff} years, ${monthDiff} months, and ${dayDiff} days</p>
+                `;
+            } else if (format === "days") {
+                resultDiv.innerHTML = `<p><strong>Total Days:</strong> ${totalDays}</p>`;
+            } else if (format === "weeks") {
+                resultDiv.innerHTML = `<p><strong>Total Weeks:</strong> ${weeks} weeks, ${remainingDays} remaining days</p>`;
+            }
+        }
+
+        function toggleDarkMode() {
+            const body = document.getElementById("main-body");
+            body.classList.toggle("dark-mode");
+        }
+    </script>
 </body>
 </html>
